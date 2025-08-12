@@ -91,6 +91,8 @@
     <None Include="extension.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Manifests\Azuravian_DescriptionFixer.yaml" />
+    <None Include="Manifests\DescriptionFixerManifest.yaml" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
