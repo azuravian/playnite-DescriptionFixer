@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using DescriptionFixer.Services;
 
 namespace DescriptionFixer
 {
@@ -15,16 +16,49 @@ namespace DescriptionFixer
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private DescriptionFixerSettingsViewModel settings { get; set; }
+        private DescriptionFixerSettingsViewModel Settings { get; set; }
 
         public override Guid Id { get; } = Guid.Parse("b86cf867-0519-49ef-b7b7-386b6a1e2830");
 
         public DescriptionFixer(IPlayniteAPI api) : base(api)
         {
-            settings = new DescriptionFixerSettingsViewModel(this);
+            Settings = new DescriptionFixerSettingsViewModel(this);
             Properties = new GenericPluginProperties
             {
                 HasSettings = true
+            };
+        }
+
+        public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
+        {
+            yield return new GameMenuItem
+            {
+                Description = "Fix game description",
+                MenuSection = "Description Fixer",
+                Action = (gmeArgs) =>
+                {
+                    // Add code to fix game description here.
+                    // For example, you can modify the game.Description property.
+                    VideoService videoSvc = new VideoService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+                    ImageService imageSvc = new ImageService(Settings.Settings, logger, GetPluginUserDataPath());
+                    gmeArgs.Games.ForEach(async game =>
+                    {
+                        if (!string.IsNullOrEmpty(game.Description))
+                        {
+                            string originalDescription = game.Description;
+                            string fixedDescription;
+                            fixedDescription = await videoSvc.ProcessVideos(game, game.Description);
+                            fixedDescription = await imageSvc.ProcessImages(game, fixedDescription);
+                            // Example modification: Append a note to the description.
+                            game.Description = fixedDescription;
+                            if (game.Description != originalDescription)
+                            {
+                                PlayniteApi.Database.Games.Update(game);
+                            }
+                            logger.Info($"Fixed description for game: {game.Name}");
+                        }
+                    });
+                }
             };
         }
 
@@ -70,7 +104,7 @@ namespace DescriptionFixer
 
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return settings;
+            return Settings;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)

@@ -10,22 +10,41 @@ namespace DescriptionFixer
 {
     public class DescriptionFixerSettings : ObservableObject
     {
-        private string option1 = string.Empty;
-        private bool option2 = false;
-        private bool optionThatWontBeSaved = false;
+        private uint _frameCount = 12;
+        private uint _quality = 75;
+        private uint _transparencyThreshold = 98; // Threshold for transparency detection
+        private bool _useJpeg = false;
+        
+        public uint FrameCount
+        {
+            get => _frameCount;
+            set => SetValue(ref _frameCount, value);
+        }
+        public uint Quality
+        {
+            get => _quality;
+            set => SetValue(ref _quality, value);
+        }
+        public uint TransparencyThreshold
+        {
+            get => _transparencyThreshold;
+            set => SetValue(ref _transparencyThreshold, value);
+        }
+        public bool UseJpeg
+        {
+            get => _useJpeg;
+            set => SetValue(ref _useJpeg, value);
+        }
 
-        public string Option1 { get => option1; set => SetValue(ref option1, value); }
-        public bool Option2 { get => option2; set => SetValue(ref option2, value); }
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
-        [DontSerialize]
-        public bool OptionThatWontBeSaved { get => optionThatWontBeSaved; set => SetValue(ref optionThatWontBeSaved, value); }
+        //[DontSerialize]
     }
 
     public class DescriptionFixerSettingsViewModel : ObservableObject, ISettings
     {
         private readonly DescriptionFixer plugin;
-        private DescriptionFixerSettings editingClone { get; set; }
+        private DescriptionFixerSettings EditingClone { get; set; }
 
         private DescriptionFixerSettings settings;
         public DescriptionFixerSettings Settings
@@ -60,14 +79,14 @@ namespace DescriptionFixer
         public void BeginEdit()
         {
             // Code executed when settings view is opened and user starts editing values.
-            editingClone = Serialization.GetClone(Settings);
+            EditingClone = Serialization.GetClone(Settings);
         }
 
         public void CancelEdit()
         {
             // Code executed when user decides to cancel any changes made since BeginEdit was called.
             // This method should revert any changes made to Option1 and Option2.
-            Settings = editingClone;
+            Settings = EditingClone;
         }
 
         public void EndEdit()

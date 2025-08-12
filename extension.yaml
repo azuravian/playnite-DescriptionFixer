@@ -1,7 +1,10 @@
 ﻿Id: DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830
-Name: Generic Plugin
-Author: John Doe
+Name: Description Image Fixer
+Author: Azuravian
 Version: 1.0
 Module: DescriptionFixer.dll
 Type: GenericPlugin
 Icon: icon.png
+Links:
+  - Name: Github
+    Url: https://github.com/azuravian/playnite-animatedgiffixer

@@ -5,10 +5,126 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
-    <StackPanel>
-        <TextBlock Text="Description for Option1:"/>
-        <TextBox Text="{Binding Settings.Option1}"/>
-        <TextBlock Text="Description for Option2:"/>
-        <CheckBox IsChecked="{Binding Settings.Option2}"/>
+    <StackPanel Margin="10">
+    
+        <GroupBox Header="Images">
+            <StackPanel Margin="5">
+
+                <TextBlock Text="Use jpg instead of webp for non-transparent images:"
+                           Margin="10,0,0,10"/>
+                <CheckBox IsChecked="{Binding Settings.UseWebp}"
+                          Margin="25,0,0,10"/>
+                <TextBlock Text="Default Image Quality:"
+                           Margin="10,0,0,10"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width=".2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Margin="10,0,0,5">
+                        <TextBlock Text="Quality: "
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Settings.Quality}"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <Slider x:Name="QualitySlider"
+                            Minimum="50" 
+                            Maximum="100"
+                            Value="{Binding Settings.Quality}"
+                            TickPlacement="BottomRight"
+                            TickFrequency="1"
+                            IsSnapToTickEnabled="True"
+                            Width="400"
+                            HorizontalAlignment="Left"
+                            Margin="25,0,0,5"/>
+                        <Grid Width="400"
+                              HorizontalAlignment="Left"
+                              Margin="25,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Smaller files" HorizontalAlignment="Left" />
+                            <TextBlock Text="Balanced" HorizontalAlignment="Center" Grid.Column="1" />
+                            <TextBlock Text="Highest quality" HorizontalAlignment="Right" Grid.Column="2" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="Transparency Threshold: A percentage from 80 to 100. This is the alpha value for pixels in the image. For an image to be considered opaque by this extension, all pixels must meet this threshold. 98 is a good default"
+                           TextWrapping="Wrap"
+                           Margin="10,0,0,10"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width=".2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Margin="10,0,0,5">
+                        <TextBlock Text="Threshold: "
+                               VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Settings.TransparencyThreshold}"
+                               VerticalAlignment="Center"
+                               Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <Slider Minimum="80" 
+                                Maximum="100" 
+                                Value="{Binding Settings.TransparencyThreshold}"
+                                TickPlacement="BottomRight"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                Width="300"
+                                HorizontalAlignment="Left"
+                                Margin="25,0,0,5"/>
+                        <Grid Width="300"
+                              HorizontalAlignment="Left"
+                              Margin="25,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="80%" HorizontalAlignment="Left" />
+                            <TextBlock Text="90%" HorizontalAlignment="Center" Grid.Column="1" />
+                            <TextBlock Text="Fully Opaque" HorizontalAlignment="Right" Grid.Column="2" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Videos">
+            <StackPanel Margin="5">
+                <TextBlock Text="Frame Count: The number of frames you want to be able to select from when replacing video elements."
+                           TextWrapping="Wrap"
+                           Margin="10,0,0,10"/>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            Margin="25,0,0,5">
+                    <TextBlock Text="{Binding Settings.FrameCount}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text=" frames"
+                               VerticalAlignment="Center"
+                               Margin="5,0,0,0"/>
+                    <Slider Minimum="6"
+                        Maximum="36"
+                        Width="300"
+                        HorizontalAlignment="Left"
+                        TickPlacement="BottomRight"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        Value="{Binding Settings.FrameCount}"
+                        Margin="25,0,0,5"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
     </StackPanel>
 </UserControl>
