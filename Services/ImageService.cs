@@ -66,6 +66,24 @@ namespace DescriptionFixer.Services
                         html = HtmlParser.ReplaceImageSrc(html, src, newImage);
                     }
                 }
+                else if (src != null && src.ToLower().Contains(".webp"))
+                {
+                    // Convert WebP to PNG or JPG
+                    logger.Info($"Converting WebP image: {src}");
+                    MagickImage webp = await ImageUtils.GetAvifData(src);
+                    if (ImageUtils.IsImageTransparent(src, settings.TransparencyThreshold))
+                    {
+                        logger.Info($"WebP image is transparent, converting to PNG: {src}");
+                        string pngImage = ImageUtils.ConvertImage(webp, settings.Quality, "png", dataPath, game);
+                        html = HtmlParser.ReplaceImageSrc(html, src, pngImage);
+                        continue;
+                    }
+                    else
+                    {
+                        // No need to convert if not transparent
+                        logger.Info($"WebP image is not transparent, keeping as WebP: {src}");
+                    }
+                }
             }
             return html;
         }
