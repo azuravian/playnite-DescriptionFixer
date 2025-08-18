@@ -36,6 +36,9 @@
     <Reference Include="FFmpeg.AutoGen, Version=7.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\FFmpeg.AutoGen.7.1.1\lib\netstandard2.0\FFmpeg.AutoGen.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.12.2.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.12.2\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Magick.NET-Q8-AnyCPU, Version=14.7.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
       <HintPath>packages\Magick.NET-Q8-AnyCPU.14.7.0\lib\netstandard20\Magick.NET-Q8-AnyCPU.dll</HintPath>
     </Reference>

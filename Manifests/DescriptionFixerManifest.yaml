@@ -12,3 +12,10 @@ Packages:
     PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.1/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_1.pext
     Changelog:
       - Added support for converting webp images to png.
+  - Version: 1.2
+    RequiredApiVersion: 6.12.0
+    ReleaseDate: 2025-08-18
+    PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.2/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_2.pext
+    Changelog:
+      - Fixed major bug that caused image files to be overwritten when the same frame number was used in multiple images.
+      - Moved video parsing to HtmlAgilityPack. 

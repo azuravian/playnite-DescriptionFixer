@@ -1,15 +1,8 @@
 ﻿using DescriptionFixer.Utilities;
 using DescriptionFixer.Views;
-using Microsoft.SqlServer.Server;
 using Playnite.SDK;
-using Playnite.SDK.Events;
 using Playnite.SDK.Models;
-using Playnite.SDK.Plugins;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -32,54 +25,59 @@ namespace DescriptionFixer.Services
 
         public async Task<string> ProcessVideos(Game game, string html)
         {
-            var videos = HtmlParser.ExtractVideoTags(html);
-            foreach (var videoTag in videos)
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
+
+            var videoNodes = doc.DocumentNode.SelectNodes("//video");
+            if (videoNodes == null) return html; // no videos
+
+            for (var i = 0; i < videoNodes.Count; i++)
             {
-                // Check if the video tag has a source attribute
-                var srcIndex = videoTag.IndexOf("src=\"", StringComparison.OrdinalIgnoreCase);
-                if (srcIndex != -1)
+                var node = videoNodes[i];
+                var sourceNode = node.SelectSingleNode(".//source[@src]");
+                if (sourceNode == null) continue;
+
+                string videoUrl = sourceNode.GetAttributeValue("src", null);
+                if (string.IsNullOrEmpty(videoUrl)) continue;
+
+                logger.Info($"Found video URL: {videoUrl}");
+
+                // Show frame selection window
+                var window = playniteAPI.Dialogs.CreateWindow(new WindowCreationOptions
                 {
-                    srcIndex += 5; // Move past 'src="'
-                    var endIndex = videoTag.IndexOf("\"", srcIndex);
-                    if (endIndex != -1)
-                    {
-                        var videoUrl = videoTag.Substring(srcIndex, endIndex - srcIndex);
-                        logger.Info($"Found video URL: {videoUrl}");
+                    ShowCloseButton = true,
+                    ShowMaximizeButton = false,
+                    ShowMinimizeButton = false
+                });
 
-                        var window = playniteAPI.Dialogs.CreateWindow(new WindowCreationOptions
-                        {
-                            ShowCloseButton = true,
-                            ShowMaximizeButton = false,
-                            ShowMinimizeButton = false
-                        });
+                var frames = await VideoUtils.ExtractFramesAsync(videoUrl, settings.FrameCount, logger);
+                var frameSelection = new FrameSelectionControl(frames);
+                window.Content = frameSelection;
+                window.Title = "Select Frame";
+                window.SizeToContent = SizeToContent.WidthAndHeight;
 
-                        var frames = await VideoUtils.ExtractFramesAsync(videoUrl, settings.FrameCount, logger);
-                        var frameSelection = new FrameSelectionControl(frames);
-                        window.Content = frameSelection;
-                        window.Title = "Select Frame";
-                        window.SizeToContent = SizeToContent.WidthAndHeight;
+                if (window.ShowDialog() == true)
+                {
+                    var selectedFrame = frameSelection.SelectedFramePath;
+                    string fileName = $"video_{i}_{Path.GetFileName(selectedFrame)}";
+                    string directory = Path.Combine(dataPath, game.Id.ToString());
+                    Directory.CreateDirectory(directory);
+                    string fullPath = Path.Combine(directory, fileName);
+                    File.Copy(selectedFrame, fullPath, true);
 
-                        if (window.ShowDialog() == true)
-                        {
-                            var selectedFrame = frameSelection.SelectedFramePath;
-                            string fileName = Path.GetFileName(selectedFrame);
-                            string directory = Path.Combine(dataPath, game.Id.ToString());
-                            if (!Directory.Exists(directory))
-                            {
-                                Directory.CreateDirectory(directory);
-                            }
-                            string fullPath = Path.Combine(directory, fileName);
-                            File.Copy(selectedFrame, fullPath, true); // Copy the selected frame to the game directory
-                            html = HtmlParser.ReplaceVideoWithImage(html, videoTag, fullPath);
-                        }
-                        else
-                        {
-                            // User cancelled
-                        }
-                    }
+                    // Replace the <video> node with an <img> node
+                    var imgNode = doc.CreateElement("img");
+                    imgNode.SetAttributeValue("src", fullPath);
+                    node.ParentNode.ReplaceChild(imgNode, node);
+                }
+                else
+                {
+                    // User cancelled
+                    continue;
                 }
             }
-            return html; // Return the modified HTML
+
+            return doc.DocumentNode.OuterHtml;
         }
     }
 }

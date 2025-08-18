@@ -78,9 +78,5 @@ namespace DescriptionFixer.Utilities
             // Replace the src attribute in the img tag
             return html.Replace($"src=\"{oldSrc}\"", $"src=\"{newSrc}\"");
         }
-        public static string ReplaceVideoWithImage(string html, string videotag, string imgsource)
-        {
-            return html.Replace(videotag, $"<img src=\"{imgsource}\" alt=\"Video frame\" />");
-        }
     }
 }
