@@ -2,7 +2,7 @@ AddonId: DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830
 IconUrl: https://raw.githubusercontent.com/azuravian/playnite-DescriptionFixer/refs/heads/master/icon.png
 Type: Generic
 InstallerManifestUrl: https://raw.githubusercontent.com/azuravian/playnite-DescriptionFixer/refs/heads/master/Manifests/DescriptionFixerManifest.yaml
-ShortDescription: Fixes descriptions for games from Steam by replacing images with supported types.
+ShortDescription: Fixes descriptions for games from Steam by replacing images with supported types. Also fixes broken emojis and converts animated gifs/videos to static images.
 Name: Description Image Fixer
 Author: Azuravian
 Links:
