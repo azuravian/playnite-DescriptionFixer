@@ -40,16 +40,18 @@ namespace DescriptionFixer
                     // Add code to fix game description here.
                     // For example, you can modify the game.Description property.
                     VideoService videoSvc = new VideoService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
-                    ImageService imageSvc = new ImageService(Settings.Settings, logger, GetPluginUserDataPath());
+                    ImageService imageSvc = new ImageService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+                    EmojiService emojiSvc = new EmojiService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
                     gmeArgs.Games.ForEach(async game =>
                     {
                         if (!string.IsNullOrEmpty(game.Description))
                         {
                             string originalDescription = game.Description;
                             string fixedDescription;
-                            fixedDescription = await videoSvc.ProcessVideos(game, game.Description);
+                            fixedDescription = await videoSvc.ProcessVideos(game, originalDescription);
                             fixedDescription = await imageSvc.ProcessImages(game, fixedDescription);
-                            // Example modification: Append a note to the description.
+                            fixedDescription = emojiSvc.ProcessEmojis(fixedDescription);
+                            
                             game.Description = fixedDescription;
                             if (game.Description != originalDescription)
                             {

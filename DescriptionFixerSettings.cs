@@ -14,7 +14,9 @@ namespace DescriptionFixer
         private uint _quality = 75;
         private uint _transparencyThreshold = 98; // Threshold for transparency detection
         private bool _useJpeg = false;
-        
+        private bool _convertGifs = true;
+        private bool _replaceEmojis = true;
+
         public uint FrameCount
         {
             get => _frameCount;
@@ -34,6 +36,17 @@ namespace DescriptionFixer
         {
             get => _useJpeg;
             set => SetValue(ref _useJpeg, value);
+        }
+
+        public bool ConvertGifs
+        {
+            get => _convertGifs;
+            set => SetValue(ref _convertGifs, value);
+        }
+        public bool ReplaceEmojis
+        {
+            get => _replaceEmojis;
+            set => SetValue(ref _replaceEmojis, value);
         }
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
