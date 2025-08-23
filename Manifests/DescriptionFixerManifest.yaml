@@ -19,10 +19,11 @@ Packages:
     Changelog:
       - Fixed major bug that caused image files to be overwritten when the same frame number was used in multiple images.
       - Moved video parsing to HtmlAgilityPack. 
-  - Version: 1.3
+  - Version: 1.3.1
     RequiredApiVersion: 6.12.0
-    ReleaseDate: 2025-08-22
-    PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.3/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_3.pext
+    ReleaseDate: 2025-08-23
+    PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.3.1/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_3_1.pext
     Changelog:
       - Added conversion of animated gifs to static images.
       - Added repair of Emojis that appear as empty boxes (▯) in Playnite.
+      - Fixed bug preventing html descriptions from being saved correctly.
