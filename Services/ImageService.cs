@@ -115,7 +115,7 @@ namespace DescriptionFixer.Services
                     }
                 }
             }
-            return html;
+            return doc.DocumentNode.OuterHtml;
         }
     }
 }
