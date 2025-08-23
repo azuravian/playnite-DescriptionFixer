@@ -30,6 +30,7 @@ namespace DescriptionFixer.Services
             doc.LoadHtml(html);
             var imgNodes = doc.DocumentNode.SelectNodes("//img");
 
+            if (imgNodes == null) return html; // no images
             for (var i = 0; i < imgNodes.Count; i++)
             {
                 var imgNode = imgNodes[i];
