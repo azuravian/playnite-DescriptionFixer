@@ -135,7 +135,7 @@ Margin="25,0,0,10"/>
             Value="{Binding Settings.FrameCount}"
             Margin="25,0,0,5"/>
                             </StackPanel>
-                            <Grid>
+                            <Grid Margin="0,10,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
@@ -154,7 +154,7 @@ Margin="25,0,0,10"/>
                                     <TextBlock Text="ffprobe path:" Margin="10,0,0,10" Grid.Row="0" Grid.Column="0"/>
                                     <TextBox Text="{Binding Settings.FFprobePath}" Margin="10,0,0,10" Grid.Row="1" Grid.Column="0"/>
                                     <Button Content="…" Command="{Binding FFProbeCommand}" Margin="0,0,10,10" Grid.Row="1" Grid.Column="1"/>
-                                    
+
                                 </Grid>
                                 <Grid Grid.Column="1" ToolTip="ffmpeg is required to process video files. Select the path to your ffmpeg.exe."
                                       ToolTipService.ShowOnDisabled="True"
@@ -172,7 +172,7 @@ Margin="25,0,0,10"/>
                                     <Button Content="…" Command="{Binding FFMpegCommand}" Margin="0,0,10,10" Grid.Row="1" Grid.Column="1"/>
                                 </Grid>
                             </Grid>
-                            
+
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Emojis" Margin="0,10,0,0">
