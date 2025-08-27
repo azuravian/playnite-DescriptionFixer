@@ -33,3 +33,10 @@ Packages:
     PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.3.2/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_3_2.pext
     Changelog:
       - Fixed crash when trying to process games with no images in the description.
+  - Version: 1.4
+    RequiredApiVersion: 6.12.0
+    ReleaseDate: 2025-08-27
+    PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.4/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_4.pext
+    Changelog:
+      - Added option to provide path to ffmpeg and ffprobe.
+      - Throw exception if ffmpeg or ffprobe are not found. 

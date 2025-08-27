@@ -20,7 +20,7 @@ namespace DescriptionFixer.Helpers
             }
 
             throw new FileNotFoundException(
-                "ffmpeg executable not found. Please set FFmpegPath in plugin settings or ensure ffmpeg is in your PATH."
+                "ffmpeg executable not found. Please set FFmpegPath in plugin settings.  FFmpeg can be downloaded from https://www.gyan.dev/ffmpeg/builds/. The latest stable release is at https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
             );
         }
 
@@ -37,7 +37,7 @@ namespace DescriptionFixer.Helpers
             }
 
             throw new FileNotFoundException(
-                "ffprobe executable not found. Please set FFprobePath in plugin settings or ensure ffprobe is in your PATH."
+                "ffprobe executable not found. Please set FFprobePath in plugin settings. FFprobe can be downloaded from https://www.gyan.dev/ffmpeg/builds/. The latest stable release is at https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
             );
         }
 
