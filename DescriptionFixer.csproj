@@ -88,6 +88,7 @@
     <Compile Include="DescriptionFixerSettingsView.xaml.cs">
       <DependentUpon>DescriptionFixerSettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FfmpegHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EmojiService.cs" />
     <Compile Include="Services\ImageService.cs" />
