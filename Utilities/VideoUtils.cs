@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime;
 using System.Threading.Tasks;
+using DescriptionFixer.Helpers;
 
 namespace DescriptionFixer.Utilities
 {
@@ -15,37 +16,32 @@ namespace DescriptionFixer.Utilities
         public static double GetVideoDuration(string videoPath)
         {
             var settings = DescriptionFixer.Instance.SettingsVM.Settings;
+            var ffprobePath = FfmpegHelper.GetFfprobePath(settings);
             var ffprobe = new ProcessStartInfo
             {
-                FileName = "ffprobe",
+                FileName = ffprobePath,
                 Arguments = $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{videoPath}\"",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            var ffprobePath = settings.FFprobePath;
-
-            if (!string.IsNullOrEmpty(ffprobePath) && File.Exists(ffprobePath))
-            {
-                ffprobe.FileName = ffprobePath;
-            }
-
             using (var process = Process.Start(ffprobe))
-            {
-                string output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-                if (double.TryParse(output, NumberStyles.Any, CultureInfo.InvariantCulture, out var duration))
                 {
-                    return duration;
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                    if (double.TryParse(output, NumberStyles.Any, CultureInfo.InvariantCulture, out var duration))
+                    {
+                        return duration;
+                    }
+                    throw new InvalidOperationException("Failed to get video duration.");
                 }
-                throw new InvalidOperationException("Failed to get video duration.");
-            }
         }
 
         public static async Task<List<string>> ExtractFramesAsync(string videoPath, uint frameCount, ILogger logger)
         {
             var settings = DescriptionFixer.Instance.SettingsVM.Settings;
+            
             string outputDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(outputDir);
             var extractedFrames = new List<string>();
@@ -60,21 +56,16 @@ namespace DescriptionFixer.Utilities
 
                 tasks.Add(Task.Run(() =>
                 {
+                    var ffmpegPath = FfmpegHelper.GetFfmpegPath(settings);
                     var ffmpeg = new ProcessStartInfo
                     {
-                        FileName = "ffmpeg",
+                        FileName = ffmpegPath,
                         Arguments = $"-vcodec libvpx-vp9 -ss {timestamp.ToString(CultureInfo.InvariantCulture)} -i \"{videoPath}\" -frames:v 1 -pix_fmt yuva420p \"{outputFile}\" -y",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
-
-                    var ffmpegPath = settings.FFmpegPath;
-                    if (!string.IsNullOrEmpty(ffmpegPath) && File.Exists(ffmpegPath))
-                    {
-                        ffmpeg.FileName = ffmpegPath;
-                    }
 
                     using (var process = Process.Start(ffmpeg))
                     {
