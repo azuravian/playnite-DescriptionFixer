@@ -1,5 +1,6 @@
 ﻿using Playnite.SDK;
 using Playnite.SDK.Data;
+using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,19 @@ namespace DescriptionFixer
         private bool _useJpeg = false;
         private bool _convertGifs = true;
         private bool _replaceEmojis = true;
+        private string _ffprobePath = string.Empty;
+        private string _ffmpegPath = string.Empty;
+
+        public string FFmpegPath
+        {
+            get => _ffmpegPath;
+            set => SetValue(ref _ffmpegPath, value);
+        }
+        public string FFprobePath
+        {
+            get => _ffprobePath;
+            set => SetValue(ref _ffprobePath, value);
+        }
 
         public uint FrameCount
         {
@@ -57,6 +71,7 @@ namespace DescriptionFixer
     public class DescriptionFixerSettingsViewModel : ObservableObject, ISettings
     {
         private readonly DescriptionFixer plugin;
+        public DescriptionFixer Plugin => plugin;
         private DescriptionFixerSettings EditingClone { get; set; }
 
         private DescriptionFixerSettings settings;
@@ -68,6 +83,30 @@ namespace DescriptionFixer
                 settings = value;
                 OnPropertyChanged();
             }
+        }
+
+        public RelayCommand<object> FFProbeCommand
+        {
+            get => new RelayCommand<object>((a) =>
+            {
+                var path = plugin.PlayniteApi.Dialogs.SelectFile("ffprobe.exe|ffprobe.exe|All files|*.*");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    Settings.FFprobePath = path;
+                }
+            });
+        }
+
+        public RelayCommand<object> FFMpegCommand
+        {
+            get => new RelayCommand<object>((a) =>
+            {
+                var path = plugin.PlayniteApi.Dialogs.SelectFile("ffmpeg.exe|ffmpeg.exe|All files|*.*");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    Settings.FFmpegPath = path;
+                }
+            });
         }
 
         public DescriptionFixerSettingsViewModel(DescriptionFixer plugin)

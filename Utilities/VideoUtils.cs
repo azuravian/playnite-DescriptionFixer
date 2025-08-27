@@ -1,9 +1,11 @@
-﻿using Playnite.SDK;
+﻿using ImageMagick;
+using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime;
 using System.Threading.Tasks;
 
 namespace DescriptionFixer.Utilities
@@ -12,6 +14,7 @@ namespace DescriptionFixer.Utilities
     {
         public static double GetVideoDuration(string videoPath)
         {
+            var settings = DescriptionFixer.Instance.SettingsVM.Settings;
             var ffprobe = new ProcessStartInfo
             {
                 FileName = "ffprobe",
@@ -20,6 +23,13 @@ namespace DescriptionFixer.Utilities
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
+
+            var ffprobePath = settings.FFprobePath;
+
+            if (!string.IsNullOrEmpty(ffprobePath) && File.Exists(ffprobePath))
+            {
+                ffprobe.FileName = ffprobePath;
+            }
 
             using (var process = Process.Start(ffprobe))
             {
@@ -35,6 +45,7 @@ namespace DescriptionFixer.Utilities
 
         public static async Task<List<string>> ExtractFramesAsync(string videoPath, uint frameCount, ILogger logger)
         {
+            var settings = DescriptionFixer.Instance.SettingsVM.Settings;
             string outputDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(outputDir);
             var extractedFrames = new List<string>();
@@ -58,6 +69,12 @@ namespace DescriptionFixer.Utilities
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
+
+                    var ffmpegPath = settings.FFmpegPath;
+                    if (!string.IsNullOrEmpty(ffmpegPath) && File.Exists(ffmpegPath))
+                    {
+                        ffmpeg.FileName = ffmpegPath;
+                    }
 
                     using (var process = Process.Start(ffmpeg))
                     {
@@ -84,7 +101,5 @@ namespace DescriptionFixer.Utilities
             await Task.WhenAll(tasks);
             return extractedFrames;
         }
-
-
     }
 }
