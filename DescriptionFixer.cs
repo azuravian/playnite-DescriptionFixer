@@ -15,14 +15,18 @@ namespace DescriptionFixer
     public class DescriptionFixer : GenericPlugin
     {
         private static readonly ILogger logger = LogManager.GetLogger();
+        public static DescriptionFixer Instance { get; private set; }
 
-        private DescriptionFixerSettingsViewModel Settings { get; set; }
+        public DescriptionFixerSettingsViewModel SettingsVM { get; private set; }
+        public DescriptionFixerSettings Settings => SettingsVM.Settings;
 
         public override Guid Id { get; } = Guid.Parse("b86cf867-0519-49ef-b7b7-386b6a1e2830");
 
         public DescriptionFixer(IPlayniteAPI api) : base(api)
         {
-            Settings = new DescriptionFixerSettingsViewModel(this);
+            Instance = this;
+            
+            SettingsVM = new DescriptionFixerSettingsViewModel(this);
             Properties = new GenericPluginProperties
             {
                 HasSettings = true
@@ -39,9 +43,9 @@ namespace DescriptionFixer
                 {
                     // Add code to fix game description here.
                     // For example, you can modify the game.Description property.
-                    VideoService videoSvc = new VideoService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
-                    ImageService imageSvc = new ImageService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
-                    EmojiService emojiSvc = new EmojiService(Settings.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+                    VideoService videoSvc = new VideoService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+                    ImageService imageSvc = new ImageService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+                    EmojiService emojiSvc = new EmojiService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
                     gmeArgs.Games.ForEach(async game =>
                     {
                         if (!string.IsNullOrEmpty(game.Description))
@@ -106,7 +110,7 @@ namespace DescriptionFixer
 
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return Settings;
+            return SettingsVM;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)
