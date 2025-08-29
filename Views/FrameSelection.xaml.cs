@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Input;
 
 
 namespace DescriptionFixer.Views
@@ -58,6 +59,14 @@ namespace DescriptionFixer.Views
                 {
                     img.Width = e.NewValue;
                 }
+            }
+        }
+
+        private void ListBoxImages_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (ListBoxImages.SelectedItem != null)
+            {
+                ButtonSelectImage_Click(ButtonSelectImage, null);
             }
         }
 
