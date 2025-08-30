@@ -13,11 +13,11 @@ namespace DescriptionFixer.Utilities
 {
     internal static class ImageUtils
     {
-        public static async Task<MagickImage> GetAvifData(string avifPath)
+        public static MagickImage GetImageData(string imgPath)
         {
             using (var httpClient = new HttpClient())
             {
-                var data = await httpClient.GetByteArrayAsync(avifPath);
+                var data = httpClient.GetByteArrayAsync(imgPath).GetAwaiter().GetResult();
                 return new MagickImage(data);
             }
         }
@@ -46,7 +46,7 @@ namespace DescriptionFixer.Utilities
                 Directory.CreateDirectory(directory);
             }
             string fullPath = Path.Combine(directory, fileName);
-            image.WriteAsync(fullPath);
+            image.Write(fullPath);
             return fullPath;
         }
 
@@ -63,7 +63,7 @@ namespace DescriptionFixer.Utilities
             return false; // Image is not transparent
         }
 
-        public static async Task<uint> GetGifFrameCount(string imagePath)
+        public static uint GetGifFrameCount(string imagePath)
         {
             uint totalFrames = 0;
             
@@ -78,7 +78,7 @@ namespace DescriptionFixer.Utilities
 
             using (var process = Process.Start(ffprobe))
             {
-                string output = await process.StandardOutput.ReadToEndAsync();
+                string output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
                 totalFrames = uint.Parse(output.Trim());
             }
@@ -86,7 +86,7 @@ namespace DescriptionFixer.Utilities
             return totalFrames;
         }
 
-        public static async Task<List<string>> ExtractGifFramesAsync(string gifPath, uint frameCount, ILogger logger)
+        public static List<string> ExtractGifFrames(Game game, string gifPath, uint frameCount, ILogger logger)
         {
             string outputDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(outputDir);
@@ -96,7 +96,7 @@ namespace DescriptionFixer.Utilities
             uint totalFrames = 0;
             try
             {
-                totalFrames = await GetGifFrameCount(gifPath);
+                totalFrames = GetGifFrameCount(gifPath);
             }
             catch (Exception ex)
             {
@@ -116,14 +116,24 @@ namespace DescriptionFixer.Utilities
                                          .Distinct()
                                          .ToList();
 
-            var tasks = new List<Task>();
-
-            foreach (int index in frameIndices)
+            var options = new GlobalProgressOptions(
+                $"{game.Name}: Extracting frames from GIF...",
+                true
+            )
             {
-                string outputFile = Path.Combine(outputDir, $"frame_{index + 1:D3}.png");
+                IsIndeterminate = false
+            };
 
-                tasks.Add(Task.Run(() =>
+            API.Instance.Dialogs.ActivateGlobalProgress(progress =>
+            {
+                progress.ProgressMaxValue = frameIndices.Count;
+
+                for (int i = 0; i < frameIndices.Count; i++)
                 {
+                    progress.CurrentProgressValue = i + 1;
+                    int index = frameIndices[i];
+                    string outputFile = Path.Combine(outputDir, $"frame_{index + 1:D3}.png");
+
                     var ffmpeg = new ProcessStartInfo
                     {
                         FileName = "ffmpeg",
@@ -153,10 +163,9 @@ namespace DescriptionFixer.Utilities
                             logger.Error($"Failed to extract frame {index}: {stdError}");
                         }
                     }
-                }));
-            }
+                }
+            }, options);
 
-            await Task.WhenAll(tasks);
             return extractedFrames;
         }
 

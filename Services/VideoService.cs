@@ -5,6 +5,8 @@ using Playnite.SDK.Models;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using HtmlAgilityPack;
+using System;
 
 namespace DescriptionFixer.Services
 {
@@ -23,13 +25,14 @@ namespace DescriptionFixer.Services
             this.playniteAPI = playniteAPI;
         }
 
-        public async Task<string> ProcessVideos(Game game, string html)
+        public Tuple<string, int> ProcessVideos(Game game, string html)
         {
-            var doc = new HtmlAgilityPack.HtmlDocument();
+            int changes = 0;
+            var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
             var videoNodes = doc.DocumentNode.SelectNodes("//video");
-            if (videoNodes == null) return html; // no videos
+            if (videoNodes == null) return Tuple.Create(html, 0); // no videos
 
             for (var i = 0; i < videoNodes.Count; i++)
             {
@@ -43,20 +46,23 @@ namespace DescriptionFixer.Services
                 logger.Info($"Found video URL: {videoUrl}");
 
                 // Show frame selection window
-                var window = playniteAPI.Dialogs.CreateWindow(new WindowCreationOptions
+                var frames = VideoUtils.ExtractFrames(game, videoUrl, settings.FrameCount, logger);
+
+                var fsWindow = playniteAPI.Dialogs.CreateWindow(new WindowCreationOptions
                 {
                     ShowCloseButton = true,
                     ShowMaximizeButton = false,
                     ShowMinimizeButton = false
                 });
 
-                var frames = await VideoUtils.ExtractFramesAsync(videoUrl, settings.FrameCount, logger);
+                fsWindow.Owner = playniteAPI.Dialogs.GetCurrentAppWindow();
+                fsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 var frameSelection = new FrameSelectionControl(frames);
-                window.Content = frameSelection;
-                window.Title = "Select Frame";
-                window.SizeToContent = SizeToContent.WidthAndHeight;
+                fsWindow.Content = frameSelection;
+                fsWindow.Title = "Select Frame";
+                fsWindow.SizeToContent = SizeToContent.WidthAndHeight;
 
-                if (window.ShowDialog() == true)
+                if (fsWindow.ShowDialog() == true)
                 {
                     var selectedFrame = frameSelection.SelectedFramePath;
                     string fileName = $"video_{i}_{Path.GetFileName(selectedFrame)}";
@@ -69,6 +75,7 @@ namespace DescriptionFixer.Services
                     var imgNode = doc.CreateElement("img");
                     imgNode.SetAttributeValue("src", fullPath);
                     node.ParentNode.ReplaceChild(imgNode, node);
+                    changes++;
                 }
                 else
                 {
@@ -77,7 +84,7 @@ namespace DescriptionFixer.Services
                 }
             }
 
-            return doc.DocumentNode.OuterHtml;
+            return Tuple.Create(doc.DocumentNode.OuterHtml, changes);
         }
     }
 }

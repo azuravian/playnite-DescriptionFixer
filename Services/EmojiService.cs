@@ -21,11 +21,12 @@ namespace DescriptionFixer.Services
             this.playniteAPI = playniteAPI;
         }
 
-        public string ProcessEmojis(string html)
+        public Tuple<string, int> ProcessEmojis(string html)
         {
+            int changes = 0;
             if (!settings.ReplaceEmojis)
             {
-                return html;
+                return Tuple.Create(html, 0);
             }
             
             string regexPattern = @"[\uD800-\uDBFF][\uDC00-\uDFFF]";
@@ -59,8 +60,9 @@ namespace DescriptionFixer.Services
                 string htmlEntityDecimal = $"&#{spcP};";
 
                 html = html.Replace(emoji, htmlEntityDecimal);
+                changes++;
             }
-            return html;
+            return Tuple.Create(html, changes);
         }
 
         private string ConvertToUnicodeCodePoints(string input)
