@@ -39,4 +39,18 @@ Packages:
     PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.4/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_4.pext
     Changelog:
       - Added option to provide path to ffmpeg and ffprobe.
-      - Throw exception if ffmpeg or ffprobe are not found. 
+      - Throw exception if ffmpeg or ffprobe are not found.
+  - Version: 1.5
+    RequiredApiVersion: 6.12.0
+    ReleaseDate: 2025-08-30
+    PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.5/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_5.pext
+    Changelog:
+      - Change ~~ all async methods changed to sync methods with progress windows.
+      - New ~~ Added report output after processing all games in selection.
+      - New ~~ cleanup function with 4 steps.
+      - 1 - Replace dashes in text nodes with their respective unicode codepoint.
+      - 2 - Move punctuation outside of formatting tags to inside of them.
+      - 3 - Fix bulleted lists so that the bullets line up with the text.
+      - 4 - Reduce excessive spacing before lists.
+      - New ~~ Ctrl+MouseWheel support for zooming in and out of image selection window.
+      - New ~~ Double click image in image selection window to select it.

@@ -3,7 +3,7 @@ IconUrl: https://raw.githubusercontent.com/azuravian/playnite-DescriptionFixer/r
 Type: Generic
 InstallerManifestUrl: https://raw.githubusercontent.com/azuravian/playnite-DescriptionFixer/refs/heads/master/Manifests/DescriptionFixerManifest.yaml
 ShortDescription: Fixes descriptions for games from Steam by replacing images with supported types. Also fixes broken emojis and converts animated gifs/videos to static images.
-Name: Description Image Fixer
+Name: Description Fixer
 Author: Azuravian
 Links:
     Website: https://github.com/azuravian/playnite-DescriptionFixer
