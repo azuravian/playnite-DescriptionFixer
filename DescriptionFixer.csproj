@@ -90,6 +90,7 @@
     </Compile>
     <Compile Include="Helpers\FfmpegHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\CleanService.cs" />
     <Compile Include="Services\EmojiService.cs" />
     <Compile Include="Services\ImageService.cs" />
     <Compile Include="Services\VideoService.cs" />
@@ -97,6 +98,9 @@
     <Compile Include="Utilities\VideoUtils.cs" />
     <Compile Include="Views\FrameSelection.xaml.cs">
       <DependentUpon>FrameSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ResultReportControl.xaml.cs">
+      <DependentUpon>ResultReportControl.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +127,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\FrameSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ResultReportControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

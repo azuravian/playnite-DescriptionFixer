@@ -88,5 +88,29 @@ namespace DescriptionFixer.Views
                 MessageBox.Show("Please select an image frame first.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        private void ListBoxImages_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                double step = SliderSize.TickFrequency > 0 ? SliderSize.TickFrequency : 25;
+
+                if (e.Delta > 0)
+                {
+                    SliderSize.Value = System.Math.Min(SliderSize.Maximum, SliderSize.Value + step);
+                }
+                else if (e.Delta < 0)
+                {
+                    SliderSize.Value = System.Math.Max(SliderSize.Minimum, SliderSize.Value - step);
+                }
+
+                e.Handled = true; // Mark the event as handled
+            }
+            else
+            {
+                // Allow normal scrolling behavior
+                e.Handled = false;
+            }
+        }
     }
 }

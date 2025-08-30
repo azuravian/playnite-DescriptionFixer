@@ -1,13 +1,12 @@
-﻿using ImageMagick;
+﻿using DescriptionFixer.Helpers;
 using Playnite.SDK;
+using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Runtime;
 using System.Threading.Tasks;
-using DescriptionFixer.Helpers;
 
 namespace DescriptionFixer.Utilities
 {
@@ -38,7 +37,7 @@ namespace DescriptionFixer.Utilities
                 }
         }
 
-        public static async Task<List<string>> ExtractFramesAsync(string videoPath, uint frameCount, ILogger logger)
+        public static List<string> ExtractFrames(Game game, string videoPath, uint frameCount, ILogger logger)
         {
             var settings = DescriptionFixer.Instance.SettingsVM.Settings;
             
@@ -47,15 +46,23 @@ namespace DescriptionFixer.Utilities
             var extractedFrames = new List<string>();
             double duration = GetVideoDuration(videoPath); // Still sync here
 
-            var tasks = new List<Task>();
-
-            for (int i = 0; i < frameCount; i++)
+            var options = new GlobalProgressOptions(
+                $"{game.Name}: Extracting frames from video...",
+                true
+            )
             {
-                double timestamp = (duration * i) / frameCount;
-                string outputFile = Path.Combine(outputDir, $"frame_{i + 1:D3}.png");
+                IsIndeterminate = false
+            };
 
-                tasks.Add(Task.Run(() =>
+            API.Instance.Dialogs.ActivateGlobalProgress(progress =>
+            {
+                progress.ProgressMaxValue = frameCount;
+                for (int i = 0; i < frameCount; i++)
                 {
+                    progress.CurrentProgressValue = i + 1;
+                    double timestamp = (duration * i) / frameCount;
+                    string outputFile = Path.Combine(outputDir, $"frame_{i + 1:D3}.png");
+
                     var ffmpegPath = FfmpegHelper.GetFfmpegPath(settings);
                     var ffmpeg = new ProcessStartInfo
                     {
@@ -86,10 +93,8 @@ namespace DescriptionFixer.Utilities
                             // Optionally log the error
                         }
                     }
-                }));
-            }
-
-            await Task.WhenAll(tasks);
+                }
+            }, options);
             return extractedFrames;
         }
     }

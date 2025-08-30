@@ -29,7 +29,8 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  BorderThickness="0"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 MouseDoubleClick="ListBoxImages_MouseDoubleClick">
+                 MouseDoubleClick="ListBoxImages_MouseDoubleClick"
+                 PreviewMouseWheel="ListBoxImages_PreviewMouseWheel">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />

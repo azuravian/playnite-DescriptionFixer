@@ -1,14 +1,14 @@
-﻿using Playnite.SDK;
+﻿using DescriptionFixer.Services;
+using DescriptionFixer.Views;
+using Playnite.SDK;
 using Playnite.SDK.Events;
-using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
-using DescriptionFixer.Services;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
 
 namespace DescriptionFixer
 {
@@ -41,31 +41,115 @@ namespace DescriptionFixer
                 MenuSection = "Description Fixer",
                 Action = (gmeArgs) =>
                 {
-                    // Add code to fix game description here.
-                    // For example, you can modify the game.Description property.
-                    VideoService videoSvc = new VideoService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
-                    ImageService imageSvc = new ImageService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
-                    EmojiService emojiSvc = new EmojiService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
-                    gmeArgs.Games.ForEach(async game =>
-                    {
-                        if (!string.IsNullOrEmpty(game.Description))
-                        {
-                            string originalDescription = game.Description;
-                            string fixedDescription;
-                            fixedDescription = await videoSvc.ProcessVideos(game, originalDescription);
-                            fixedDescription = await imageSvc.ProcessImages(game, fixedDescription);
-                            fixedDescription = emojiSvc.ProcessEmojis(fixedDescription);
-                            
-                            game.Description = fixedDescription;
-                            if (game.Description != originalDescription)
-                            {
-                                PlayniteApi.Database.Games.Update(game);
-                            }
-                            logger.Info($"Fixed description for game: {game.Name}");
-                        }
-                    });
+                    ProcessGames(gmeArgs);
                 }
             };
+        }
+
+        private void ProcessGames(GameMenuItemActionArgs gmeArgs)
+        {
+            VideoService videoSvc = new VideoService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+            ImageService imageSvc = new ImageService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+            EmojiService emojiSvc = new EmojiService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+            CleanService cleanSvc = new CleanService(SettingsVM.Settings, logger, GetPluginUserDataPath(), PlayniteApi);
+
+            int changesVideo = 0;
+            int changesAvifToPng = 0;
+            int changesAvifToWebp = 0;
+            int changesWebpToPng = 0;
+            int changesGif = 0;
+            int changesEmoji = 0;
+            int changesClean = 0;
+            HtmlDocument maindoc;
+            List<HtmlNode> gifNodes;
+            List<string> changedGames = new List<string>();
+
+            foreach (var game in gmeArgs.Games)
+            {
+                if (!string.IsNullOrEmpty(game.Description))
+                {
+                    string originalDescription = game.Description;
+                    string fixedDescription;
+
+                    // Video processing
+                    int cvideo = 0;
+                    (fixedDescription, cvideo) = videoSvc.ProcessVideos(game, originalDescription);
+                    changesVideo += cvideo;
+
+                    // Image processing
+                    int cAvifToPng = 0;
+                    int cAvifToWebp = 0;
+                    int cWebpToPng = 0;
+                    (maindoc, cAvifToPng, cAvifToWebp, cWebpToPng, gifNodes) = imageSvc.ProcessImages(game, fixedDescription);
+                    changesAvifToPng += cAvifToPng;
+                    changesAvifToWebp += cAvifToWebp;
+                    changesWebpToPng += cWebpToPng;
+
+                    // Gif processing
+                    int cGif = 0;
+                    (gifNodes, cGif) = imageSvc.ProcessGifs(game, gifNodes);
+                    changesGif += cGif;
+                    fixedDescription = maindoc.DocumentNode.OuterHtml;
+
+                    // Emoji processing
+                    int cEmoji = 0;
+                    (fixedDescription, cEmoji) = emojiSvc.ProcessEmojis(fixedDescription);
+                    changesEmoji += cEmoji;
+
+                    // Cleaning
+                    int cClean = 0;
+                    (fixedDescription, cClean) = cleanSvc.CleanDescription(fixedDescription);
+                    changesClean += cClean;
+
+                    game.Description = fixedDescription;
+                    if (game.Description != originalDescription)
+                    {
+                        PlayniteApi.Database.Games.Update(game);
+                        changedGames.Add(game.Name);
+                    }
+
+                    logger.Info($"Fixed description for game: {game.Name}");
+                }
+            }
+
+            // Show results
+            if (changedGames.Count > 0)
+            {
+                var reportControl = new ResultReportControl();
+
+                reportControl.SetResults(
+                    changedGames: changedGames,
+                    videoImageChanges: new Dictionary<string, int>
+                    {
+                            { "Videos converted to single image", changesVideo },
+                            { "Animated Gifs converted to single image", changesGif },
+                            { "Avif converted to Png", changesAvifToPng },
+                            { "Avif converted to WebP", changesAvifToWebp },
+                            { "WebP converted to Png", changesWebpToPng }
+                    },
+                    emojiRepaired: changesEmoji,
+                    formattingChanges: changesClean
+                );
+
+                var reportWindow = PlayniteApi.Dialogs.CreateWindow(new WindowCreationOptions
+                {
+                    ShowCloseButton = true,
+                    ShowMaximizeButton = false,
+                    ShowMinimizeButton = false
+                });
+
+                reportWindow.Owner = PlayniteApi.Dialogs.GetCurrentAppWindow();
+                reportWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                reportWindow.Content = reportControl;
+                reportWindow.Title = "Description Fixer - Results";
+                reportWindow.SizeToContent = SizeToContent.WidthAndHeight;
+
+                reportWindow.ShowDialog();
+            }
+            else
+            {
+                logger.Info("No changes were made to the descriptions of the selected games.");
+            }
         }
 
         public override void OnGameInstalled(OnGameInstalledEventArgs args)
