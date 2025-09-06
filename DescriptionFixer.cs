@@ -71,16 +71,11 @@ namespace DescriptionFixer
                     string originalDescription = game.Description;
                     string fixedDescription;
 
-                    // Video processing
-                    int cvideo = 0;
-                    (fixedDescription, cvideo) = videoSvc.ProcessVideos(game, originalDescription);
-                    changesVideo += cvideo;
-
                     // Image processing
                     int cAvifToPng = 0;
                     int cAvifToWebp = 0;
                     int cWebpToPng = 0;
-                    (maindoc, cAvifToPng, cAvifToWebp, cWebpToPng, gifNodes) = imageSvc.ProcessImages(game, fixedDescription);
+                    (maindoc, cAvifToPng, cAvifToWebp, cWebpToPng, gifNodes) = imageSvc.ProcessImages(game, originalDescription);
                     changesAvifToPng += cAvifToPng;
                     changesAvifToWebp += cAvifToWebp;
                     changesWebpToPng += cWebpToPng;
@@ -90,6 +85,11 @@ namespace DescriptionFixer
                     (gifNodes, cGif) = imageSvc.ProcessGifs(game, gifNodes);
                     changesGif += cGif;
                     fixedDescription = maindoc.DocumentNode.OuterHtml;
+
+                    // Video processing
+                    int cvideo = 0;
+                    (fixedDescription, cvideo) = videoSvc.ProcessVideos(game, fixedDescription);
+                    changesVideo += cvideo;
 
                     // Emoji processing
                     int cEmoji = 0;
