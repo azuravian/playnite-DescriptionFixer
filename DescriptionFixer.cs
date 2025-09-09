@@ -93,7 +93,7 @@ namespace DescriptionFixer
                     changesVideo += cvideo;
 
                     // Set Image Max-Width
-                    ImageUtils.SetMaxWidth(fixedDescription);                    
+                    fixedDescription = ImageUtils.SetMaxWidth(fixedDescription);                    
 
                     // Emoji processing
                     int cEmoji = 0;
