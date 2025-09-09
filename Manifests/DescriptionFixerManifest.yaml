@@ -54,3 +54,10 @@ Packages:
       - 4 - Reduce excessive spacing before lists.
       - New ~~ Ctrl+MouseWheel support for zooming in and out of image selection window.
       - New ~~ Double click image in image selection window to select it.
+  - Version: 1.6
+    RequiredApiVersion: 6.12.0
+    ReleaseDate: 2025-09-09
+    PackageUrl: https://github.com/azuravian/playnite-DescriptionFixer/releases/download/v1.6/DescriptionFixer_b86cf867-0519-49ef-b7b7-386b6a1e2830_1_6.pext
+    Changelog:
+      - Incorporated PR10 from @Jeshibu
+      - Fixed issue No. 9 where some images have attributes causing them to extend outside of the borders of the description field.

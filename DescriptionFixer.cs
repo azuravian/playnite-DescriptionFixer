@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using DescriptionFixer.Utilities;
 
 namespace DescriptionFixer
 {
@@ -90,6 +91,9 @@ namespace DescriptionFixer
                     int cvideo = 0;
                     (fixedDescription, cvideo) = videoSvc.ProcessVideos(game, fixedDescription);
                     changesVideo += cvideo;
+
+                    // Set Image Max-Width
+                    fixedDescription = ImageUtils.SetMaxWidth(fixedDescription);                    
 
                     // Emoji processing
                     int cEmoji = 0;
