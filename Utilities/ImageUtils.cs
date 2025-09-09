@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace DescriptionFixer.Utilities
 {
@@ -169,5 +168,22 @@ namespace DescriptionFixer.Utilities
             return extractedFrames;
         }
 
+        public static string SetMaxWidth(string html)
+        {
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
+            var imgNodes = doc.DocumentNode.SelectNodes("//img");
+            if (imgNodes != null)
+            {
+                foreach (var img in imgNodes)
+                {
+                    var style = img.GetAttributeValue("style", "");
+                    if (!style.Contains("max-width"))
+                        img.SetAttributeValue("style", "max-width: 100%; height: auto;");
+                }
+                return doc.DocumentNode.OuterHtml;
+            }
+            return html;
+        }
     }
 }
